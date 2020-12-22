@@ -12,6 +12,7 @@
  * を 使用しています。
  * 
  * @author     7M4MON <github.com/7m4mon>
+ * @date       17, Dec, 2020
  * @license    GPL v2
 **/
 
