@@ -13,6 +13,6 @@ APRSには気象局というカテゴリがあり、位置情報に気温や気�
 このプログラムは IC-705 と 気象センサ、およびArduinoとUSB Host Shieldを組み合わせて  
 D-PRSの気象局を構築したものです。  
 
-![](https://github.com/7m4mon/prs_usb_bme280/blob/master/dprs_bme280_block_sch.png)
+![](https://github.com/7m4mon/dprs_usb_bme280/blob/main/dprs_bme280_block_sch.png)
 
-![](https://github.com/7m4mon/prs_usb_bme280/blob/master/dprs_bme280_inside.jpg)
+![](https://github.com/7m4mon/dprs_usb_bme280/blob/main/dprs_bme280_inside.jpg)
