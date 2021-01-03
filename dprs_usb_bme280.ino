@@ -18,6 +18,7 @@
 
 #include <cdcacm.h>
 #include <usbhub.h>
+#include <Adafruit_SleepyDog.h>
 
 #include "pgmstrings.h"
 
@@ -32,6 +33,7 @@
 #include "SparkFunBME280.h"
 BME280 mySensor;
 
+//#define SER_RCV /* for SerialReceive */
 char wxStr[] = ".../...g...t...r...p...P...h..b.....\r\n"; // +\0 Fixed length 40 bytes
 class ACMAsyncOper : public CDCAsyncOper
 {
@@ -65,8 +67,8 @@ uint8_t ACMAsyncOper::OnInit(ACM *pacm)
     return rcode;
 }
 
-USB     Usb;
-USBHub     Hub(&Usb);       // IC-705は内部のUSBハブ経由でcdc_acmが接続されている。（もう一方はオーディオ)
+USB           Usb;
+USBHub        Hub(&Usb);       // IC-705は内部のUSBハブ経由でcdc_acmが接続されている。（もう一方はオーディオ)
 ACMAsyncOper  AsyncOper;
 ACM           Acm(&Usb, &AsyncOper);
 
@@ -88,8 +90,9 @@ void setup()
   {
     Serial.println("The sensor did not respond. Please check wiring.");
     while(1); //Freeze
+  }else{
+     make_wx_str();  // センサから読み取って気象データの文字列を作成する。
   }
-  
 }
 
 // センサから読み取って気象データの文字列を作成する。
@@ -109,22 +112,18 @@ void make_wx_str(){
 
 void loop()
 {
-    delay(500);
-    make_wx_str();  // センサから読み取って気象データの文字列を作成する。
-    
     Usb.Task();
-
     if( Acm.isReady()) {
+        make_wx_str();  // センサから読み取って気象データの文字列を作成する。
         uint8_t rcode;
-
         // Acm.SndData は送った後にポインタの中身をクリアするので
         // 別途バッファを用意する。
         char usbSndBuff[40];
         strcpy(usbSndBuff, wxStr);
         
         //rcode = Acm.SndData(39, usbSndBuff);  
-        // 一度にまとめて送っても反映されないので
-        // 1文字ずつ送る。サンプルプログラムと同じ。
+        // 一度にまとめて送っても反映されないので1文字ずつ送る。
+        // サンプルプログラムと同じ。
         Serial.print("wxSend: ");
         for(uint8_t i = 0; i <38; i++){
              Serial.print(wxStr[i], HEX);
@@ -138,6 +137,7 @@ void loop()
         } //for
         Serial.println();
 
+        #ifdef SER_RCV
         /* reading from usb device */
         /* buffer size must be greater or equal to max.packet size */
         /* it it set to 64 (largest possible max.packet size) here, can be tuned down
@@ -154,6 +154,10 @@ void loop()
                 Serial.print((char)buf[i]); //printing on the screen
               }
             }
+        #endif
+        Watchdog.sleep(500);       // delay:8.5mA → WDT.Sleep:7.1mA @12V
+    }       //if( Usb.getUsbTaskState() == USB_STATE_RUNNING..
+    else{   //Acm.isNotRady
         delay(10);
-    }//if( Usb.getUsbTaskState() == USB_STATE_RUNNING..
+    }
 }
