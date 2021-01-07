@@ -9,6 +9,9 @@
  * と
  * SparkFun_BME280_Arduino_Library (MIT) 
  * https://github.com/sparkfun/SparkFun_BME280_Arduino_Library
+ * と
+ * Adafruit SleepyDog Arduino Library (MIT)
+ * https://github.com/adafruit/Adafruit_SleepyDog
  * を 使用しています。
  * 
  * @author     7M4MON <github.com/7m4mon>
@@ -68,7 +71,7 @@ uint8_t ACMAsyncOper::OnInit(ACM *pacm)
 }
 
 USB           Usb;
-USBHub        Hub(&Usb);       // IC-705は内部のUSBハブ経由でcdc_acmが接続されている。（もう一方はオーディオ)
+USBHub        Hub(&Usb);       // IC-705は内部のUSBハブ経由でcdc_acmが接続されている。（もう一方はオーディオ）
 ACMAsyncOper  AsyncOper;
 ACM           Acm(&Usb, &AsyncOper);
 
@@ -155,7 +158,8 @@ void loop()
               }
             }
         #endif
-        Watchdog.sleep(500);       // delay:8.5mA → WDT.Sleep:7.1mA @12V
+        Watchdog.sleep(500);       // delay:8.5mA → WDT.Sleep:7.1mA @12V ; 
+                                   // 動作中:8.5mA ; 23Aが12V 45mAhなので6時間くらい動作する計算
     }       //if( Usb.getUsbTaskState() == USB_STATE_RUNNING..
     else{   //Acm.isNotRady
         delay(10);
